@@ -2,7 +2,7 @@ from typing import List
 import Cluster
 
 
-class Kafka:
+class Service:
 
     def __init__(self, properties: List[float]):
         self.Properties = properties
@@ -15,6 +15,8 @@ class Kafka:
         assuming that if the property of the kafka is bigger, then the cluster doesn't have enough resources to obtain this kafka
         :return: if this kafka can fit in the input cluster
         """
+        if not cluster.Is_Open:
+            return False
         for prop1, prop2 in zip(self.Properties, cluster.Properties):
             if prop1 > prop2:
                 return False
