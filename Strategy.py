@@ -3,6 +3,7 @@ from typing import List
 from Cluster import Cluster
 import Service
 import copy
+from config import *
 
 """
 all the different possible policies to choose cluster for the given kafka.
@@ -59,7 +60,7 @@ class ConcreteStrategyA(Strategy):
     def open_new_cluster_strategy(self, service: Service, clusters_list: List[Cluster]):
         # At this time, no need to create deepcopy here because this function
         # will always work on the copy created in choose_cluster_strategy function
-        new_cluster = Cluster([service], service.Properties)
+        new_cluster = Cluster(CLUSTER_MAX_PRICE, CLUSTER_MAX_SERVICE_COUNT, [service], service.Properties)
         clusters_list.append(new_cluster)
         return clusters_list  # the change is "in-place" so this line is only for future use
 
