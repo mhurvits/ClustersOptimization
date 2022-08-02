@@ -1,9 +1,7 @@
-import copy
 from typing import List
-from Cluster import Cluster
-from Service import Service
-import Strategy
-# from __future__ import annotations
+from cluster import Cluster
+from service import Service
+from strategy import Strategy, calculate_total_price
 
 
 class Context:
@@ -16,10 +14,17 @@ class Context:
         Usually, the Context accepts a strategy through the constructor, but
         also provides a setter to change it at runtime.
         """
-        self.services = service_list
-        # self.clusters = copy.deepcopy(clusters_list)
-        self.clusters = clusters_list
+        self.Services = service_list
+        self.Clusters = clusters_list
+        self.Total_Price = self.calculate_total_price()
         self._strategy = strategy
+
+    def calculate_total_price(self):
+        total = 0
+        for cluster in self.Clusters:
+            total += cluster.Price
+        return total
+
 
     @property
     def strategy(self) -> Strategy:
@@ -44,5 +49,8 @@ class Context:
         The Context delegates some work to the Strategy object instead of
         implementing multiple versions of the algorithm on its own.
         """
-        return self._strategy.do_algorithm(self.services, self.clusters)
+        updated_clusters_list = self._strategy.do_algorithm(self.Services, self.Clusters)
+        return calculate_total_price(updated_clusters_list)
+        # return updated_clusters_list  # maybe we should add the total price calculation here
+
 

@@ -1,5 +1,5 @@
 from typing import List
-import Cluster
+from cluster import Cluster
 
 
 class Service:
@@ -7,7 +7,6 @@ class Service:
     def __init__(self, properties: List[float]):
         self.Properties = properties
         self.Cluster = None  # do we want each Kafka to know its cluster?
-
 
     def check_match_to_cluster(self, cluster: Cluster):
         """
@@ -22,3 +21,11 @@ class Service:
                 return False
         return True
 
+    def update_cluster_with_service(self, cluster: Cluster):
+        i = 0
+        for prop1, prop2 in zip(cluster.Properties, self.Properties):
+            new_prop = prop1 - prop2
+            cluster.Properties[i] = new_prop  # bad coding: Need to define setter function
+            if new_prop == 0:  # notice that new_prop can't be lower than 0 according to the "Choose Cluster Policy"
+                cluster.close_cluster()
+            i += 1
