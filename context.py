@@ -1,7 +1,7 @@
 from typing import List
 from cluster import Cluster
 from service import Service
-from strategy import Strategy, calculate_total_price
+from strategy import Strategy
 
 
 class Context:
@@ -24,6 +24,13 @@ class Context:
         for cluster in self.Clusters:
             total += cluster.Price
         return total
+
+    def get_strategy_description_on_input(self):
+        """
+        build dictionay {service.name : cluster.name}
+        :return:
+        """
+        return None
 
 
     @property
@@ -48,9 +55,11 @@ class Context:
         """
         The Context delegates some work to the Strategy object instead of
         implementing multiple versions of the algorithm on its own.
+        The change in the clusters_list can be seen in self.Clusters due to the fact that
+        the change in do_algorithm is done in-place. Therefore no need to return updated_clusters_list
         """
-        updated_clusters_list = self._strategy.do_algorithm(self.Services, self.Clusters)
-        return calculate_total_price(updated_clusters_list)
-        # return updated_clusters_list  # maybe we should add the total price calculation here
+        self._strategy.do_algorithm(self.Services, self.Clusters)
+        return self.calculate_total_price()
+
 
 

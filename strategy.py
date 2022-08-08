@@ -4,21 +4,6 @@ from cluster import Cluster
 from service import Service
 from DefaultClusters import *
 
-"""
-all the different possible policies to choose cluster for the given kafka.
-As for now, contains only very trivial one that chooses the first cluster that is available . 
-"""
-
-# has duplicate method in context
-def calculate_total_price(clusters_list: List[Cluster]) -> float:
-    """
-    static method foe checking the total price of list of clusters
-    """
-    total = 0
-    for cluster in clusters_list:
-        total += cluster.Price
-    return total
-
 
 class Strategy(ABC):
     """
@@ -50,7 +35,6 @@ class ConcreteStrategyA(Strategy):
     """
 
     def choose_cluster_strategy(self, service: Service, clusters_list: List[Cluster]):
-        # clusters_list_copy = copy.deepcopy(clusters_list)  # for not changing the input
         is_found = False
         for cluster in clusters_list:
             if service.check_match_to_cluster(cluster):
@@ -61,10 +45,11 @@ class ConcreteStrategyA(Strategy):
         return is_found, clusters_list
 
     def open_new_cluster_strategy(self, service: Service, clusters_list: List[Cluster]):
-        new_cluster = Cluster(Price.LARGE.value, [service], Properties.LARGE.value)
+        new_cluster = Cluster('NewCluster', Price.LARGE.value, [service], Properties.LARGE.value)
         clusters_list.append(new_cluster)
         return clusters_list  # the change is "in-place" so this line is only for future use
 
+# notice that this method changes the input inplace
     def do_algorithm(self, service_list, clusters_list: List[Cluster]):
         outcome = (False, [])
         for service in service_list:
@@ -82,6 +67,7 @@ class ConcreteStrategyB(Strategy):
     """
     def do_algorithm(self, service_list, clusters_list: List[Cluster]):
         for service in service_list:
-            new_cluster = Cluster(Price.SMALL.value, [service], Properties.SMALL.value)
+            new_cluster = Cluster('NewCluster', Price.SMALL.value, [service], Properties.SMALL.value)
+            service.Cluster = new_cluster
             clusters_list.append(new_cluster)
         return clusters_list  # the change is done in place so this line is only for convenience and code arrangement

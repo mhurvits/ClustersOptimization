@@ -4,9 +4,10 @@ from cluster import Cluster
 
 class Service:
 
-    def __init__(self, properties: List[float]):
+    def __init__(self, name: str, properties: List[float]):
+        self.Name = name
         self.Properties = properties
-        self.Cluster = None  # do we want each Kafka to know its cluster?
+        self.Cluster = None
 
     def check_match_to_cluster(self, cluster: Cluster):
         """

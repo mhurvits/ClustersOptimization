@@ -1,10 +1,11 @@
-# from typing import List
+from typing import List
 # from service import Service
 
 
 class Cluster:
     # def __init__(self, price, service_list: List[Service], properties: List[float]):
-    def __init__(self, price, service_list, properties):
+    def __init__(self, name: str, price: int, service_list, properties: List[float]):
+        self.Name = name
         self.Price = price
         self.Services = service_list
         self.Properties = properties
