@@ -1,20 +1,7 @@
 from cluster import Cluster
 from service import Service
 from copy import deepcopy
-from context import Context
 from strategy import *
-
-
-def calculate_best_strategy(service_list, list_of_clusters):
-    strategies_total_prices = []
-    for st_j in Strategy.__subclasses__():
-        clusters_list_st_j = deepcopy(list_of_clusters)  # for not changing the input
-        service_list_st_j = deepcopy(service_list)  # for not changing the input
-        context_st_j = Context(service_list_st_j, clusters_list_st_j, st_j())
-        price_st_j = context_st_j.do_some_business_logic()
-        strategies_total_prices.append((st_j, price_st_j))
-    return min(strategies_total_prices, key=lambda x: x[1])
-
 
 """
 1. creates active clusters list from ACTIVE_CLUSTERS file - V
@@ -26,29 +13,36 @@ def calculate_best_strategy(service_list, list_of_clusters):
 # 1 - creates list of clusters from file
 with open('ACTIVE_CLUSTERS') as f:
     lines = f.readlines()
-    cd = [line.strip().split(',') for line in lines]
+    clusters_data = [line.strip().split(',') for line in lines]
 
 clusters_list = []
-for c in cd:
+for c in clusters_data:
     name = c[0]
     price = int(c[1])
     properties = [float(c[i]) for i in range(2, len(c))]
     clusters_list.append(Cluster(name, price, [], properties))
 
-# 2 - creates list of services from user
-user_services = []
-service_cnt = int(input('How many services would you like to add? '))
-print('\n')
-for s in range(1, service_cnt + 1):
-    name = input('Enter {}\'st service name '.format(s))
-    cpu = input('Enter {}\'st service CPU need '.format(s))
-    network = input('Enter {}\'st service network need '.format(s))
-    memory = input('Enter {}\'st service memory need '.format(s))
-    service = Service(name, [float(cpu), float(network), float(memory)])
-    user_services.append(service)
-    print('-----------------------------------------------')
+# 2 - creates list of services from file
+with open('SERVICE_LIST') as f:
+    lines = f.readlines()
+    services_data = [line.strip().split(',') for line in lines]
 
-# 3 - calculate the total price of each strategy
-best_st = calculate_best_strategy(user_services, clusters_list)
+services_list = []
+for c in services_data:
+    name = c[0]
+    properties = [float(c[i]) for i in range(1, len(c))]
+    services_list.append(Service(name, properties))
+
+
+# 3 - calculate placing for each strategy
+for st in Strategy.__subclasses__():
+    strategy = st(st.__name__, deepcopy(clusters_list))
+    strategy.calculate_new_placing(services_list)
+    placing = strategy.export_placing_to_list()
+    total_price = strategy.calculate_price()
+    running_time = strategy.calculate_running_time()
+    print("-----------------------------------------------------------------------------------------------------------")
+    print(f"{strategy.Name} costs {total_price}$ in total and takes {running_time} seconds to run.\n it's placing is: "
+          f"\n {placing}")
 
 
